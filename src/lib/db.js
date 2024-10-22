@@ -1,13 +1,17 @@
 import mysql from 'mysql2/promise';
+require('dotenv').config(); // Load .env variables
 
 async function query(sql, params) {
+
+    console.log(process.env.SHORT)
+
     try {
         const connection = await mysql.createConnection({
-            host: "sql12.freemysqlhosting.net", // new host
-            user: "sql12739815", // new username
-            password: "caYUSUFEW5", // new password
-            database: "sql12739815", // database name
-            port: 3306 // use the given port
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            port: process.env.SHORT 
         });
         
         if (connection) {
