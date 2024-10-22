@@ -5,12 +5,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-geist-mono: "Bangers", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    
   }
 }
 
@@ -18,10 +20,51 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  
+}
+
+.font-bangers {
+  font-family: var(--font-geist-mono), sans-serif;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100%; /* Ensure the body takes full height */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit; /* Make sure all elements respect the box-sizing */
+}
+
+main {
+  /* Adjusting the main area */
+  padding: 1rem; /* Add some padding for aesthetics */
+  height: calc(100vh - 80px); /* Example height calculation, adjust based on Navbar/Footer height */
+}
+
+
+/* Add 3D perspective for flip effect */
+.relative {
+  perspective: 1000px;
+}
+
+/* Flip effect */
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Prevent backface visibility */
+.backface-hidden {
+  backface-visibility: hidden;
 }
