@@ -88,7 +88,7 @@ const FlashcardSwiper = ({ flashcards }) => {
         return (
           <div
             key={flashcard._id}
-            className={`absolute w-80 h-96 bg-gray-300 rounded-lg shadow-lg transition-transform duration-500 ${cardStyle}`}
+            className={`absolute w-80 h-80 bg-gray-300 rounded-lg shadow-lg transition-transform duration-500 ${cardStyle}`}
           >
             <Flashcard
               question={flashcard.question}
