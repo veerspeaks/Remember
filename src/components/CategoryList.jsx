@@ -22,7 +22,8 @@ const CategoryList = ({ categories: initialCategories }) => {
                         </Link>
                     </li>
                 ))}
-                <li className={`relative z-400`}>
+                {/* Ensure the AddCategoryForm is always on top */}
+                <li style={{ zIndex: 400 }} className="relative">
                     <AddCategoryForm addCategory={addCategory} />
                 </li>
             </ul>
