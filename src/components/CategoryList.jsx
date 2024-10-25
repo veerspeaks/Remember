@@ -22,7 +22,7 @@ const CategoryList = ({ categories: initialCategories }) => {
                         </Link>
                     </li>
                 ))}
-                <li className={`relative z-100`}>
+                <li className={`relative z-400`}>
                     <AddCategoryForm addCategory={addCategory} />
                 </li>
             </ul>
