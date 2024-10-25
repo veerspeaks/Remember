@@ -61,7 +61,7 @@ const Search = () => {
     <div ref={searchRef} className="relative w-full md:w-1/3 px-4">
       <input
         type="text"
-        className="rounded-full w-full px-4 py-2 border border-gray-300"
+        className="rounded-full w-full px-4 py-2 border border-gray-300 text-black"
         placeholder="Search"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
