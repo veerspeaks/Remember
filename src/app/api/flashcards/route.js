@@ -2,7 +2,7 @@ import query from "../../../lib/db.js";
 
 
 export async function GET(req) {
-    console.log(req)
+    
     const {searchParams} = new URL(req.url)
     const categoryId = searchParams.get('categoryId')
 
@@ -14,6 +14,7 @@ export async function GET(req) {
       
       return new Response(JSON.stringify(flashcards), { status: 200 });
     }
+
 
 
 

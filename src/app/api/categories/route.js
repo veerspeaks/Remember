@@ -3,7 +3,7 @@ import query from "../../../lib/db.js";
 
 export async function GET() {
     const categories = await query ('SELECT * FROM categories')
-    console.log(categories)
+    
     return new Response(JSON.stringify(categories), {status:200 })
 }
 

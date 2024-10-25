@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Search from "./Search"
 
 export default function Navbar(){
 
@@ -8,7 +9,7 @@ export default function Navbar(){
                 <span >REMEMBER?</span>
             </Link>
             
-            <input className = "rounded-full w-1/3" placeholder=" Search"/>
+            <Search/>
         </div>
     )
 }

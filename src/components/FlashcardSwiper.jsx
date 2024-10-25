@@ -93,6 +93,8 @@ const FlashcardSwiper = ({ flashcards }) => {
             <Flashcard
               question={flashcard.question}
               answer={flashcard.answer}
+              categoryId={flashcard.category_id}
+              cardId={flashcard.id}
               isFlipped={index === activeIndex && flipped} // Only flip the active card
               handleFlip={handleFlip} // Pass down the flip handler
             />

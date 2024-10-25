@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import localFont from 'next/font/local';
@@ -14,17 +14,26 @@ const geistMono = localFont({
 });
 
 
-const NewOrEditCard = ({ params }) => {
+const EditCard = ({ params, data}) => {
   const [content, setContent] = useState(''); // Track content state
   const [back,setBack] = useState('')
   const router = useRouter(); // Use Next.js router for navigation
+  console.log(data)
+  
+    useEffect(() => {
+
+      setContent(data.question);
+      setBack(data.answer)
+        
+    },[data])
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(content);
+    
 
     try {
-      const response = await axios.post(`/api/flashcards?categoryId=${params.id}`, { content , back });
+      const response = await axios.post(`/api/singlecard?categoryId=${params.id}&cardId=${params.cardid}`, { content , back });
 
       if (response.status === 201) {
         console.log('New Card added successfully');
@@ -38,11 +47,14 @@ const NewOrEditCard = ({ params }) => {
     }
   };
 
+
+
   return (
-    <div className="flex flex-col items-center justify-center p-4 w-full mt-8 gap-8">
+    <div className="flex flex-col items-center justify-center p-4 w-full gap-8">
       <Link href={`/category/${params.id}`}>
         <button className='px-4 bg-white text-black rounded-full font-bold py-1 '> {`< Go Back`} </button>
       </Link>
+      
       {/* Quill editor container */}
       <span className={`${geistMono.variable} font-bangers antialiased text-red-600`}>Card Front</span>
       <textarea
@@ -69,4 +81,4 @@ const NewOrEditCard = ({ params }) => {
   );
 };
 
-export default NewOrEditCard;
+export default EditCard;
