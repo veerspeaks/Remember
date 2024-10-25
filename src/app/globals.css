@@ -68,3 +68,28 @@ main {
 .backface-hidden {
   backface-visibility: hidden;
 }
+
+@font-face {
+  font-family: "Bangers";
+  src: url("./fonts/Bangers-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.remember-animation .bounce {
+  display: inline-block;
+  animation: bounce 0.6s infinite;
+}
+
+.remember-animation .bounce.delay-0 { animation-delay: 0s; }
+.remember-animation .bounce.delay-1 { animation-delay: 0.1s; }
+.remember-animation .bounce.delay-2 { animation-delay: 0.2s; }
+.remember-animation .bounce.delay-3 { animation-delay: 0.3s; }
+.remember-animation .bounce.delay-4 { animation-delay: 0.4s; }
+.remember-animation .bounce.delay-5 { animation-delay: 0.5s; }
+.remember-animation .bounce.delay-6 { animation-delay: 0.6s; }
