@@ -76,11 +76,45 @@ const FlashcardSwiper = ({ flashcards }) => {
     }
   };
 
+  const handleMouseDown = (e) => {
+    startY.current = e.clientY; // Use clientY for mouse events
+    startTime.current = Date.now();
+  };
+
+  const handleMouseMove = (e) => {
+    if (startY.current === 0) return; // Prevent action if not initiated
+    const endY = e.clientY;
+    const distance = startY.current - endY;
+
+    // Handle swipes based on the distance
+    if (Math.abs(distance) > minSwipeDistance) {
+      if (distance > minSwipeDistance) {
+        // Swipe Up -> Move to the next card
+        setFlipped(false);
+        setActiveIndex((prevIndex) => (prevIndex + 1) % orderedFlashcards.length);
+      } else {
+        // Swipe Down -> Move to the previous card
+        setFlipped(false);
+        setActiveIndex((prevIndex) =>
+          prevIndex === 0 ? orderedFlashcards.length - 1 : prevIndex - 1
+        );
+      }
+      startY.current = 0; // Reset after swipe
+    }
+  };
+
+  const handleMouseUp = () => {
+    startY.current = 0; // Reset on mouse up
+  };
+
   return (
     <div
       className="relative flex justify-center items-center h-full w-full"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown} // Add mouse down event
+      onMouseMove={handleMouseMove} // Add mouse move event
+      onMouseUp={handleMouseUp} // Add mouse up event
     >
       {orderedFlashcards.map((flashcard, index) => {
         const cardStyle = getCardStyle(index);
