@@ -107,6 +107,21 @@ const FlashcardSwiper = ({ flashcards }) => {
     startY.current = 0; // Reset on mouse up
   };
 
+  const handleWheel = (e) => {
+    e.preventDefault(); // Prevent default scrolling behavior
+    if (e.deltaY < 0) {
+      // Scroll Up -> Move to the previous card
+      setFlipped(false);
+      setActiveIndex((prevIndex) =>
+        prevIndex === 0 ? orderedFlashcards.length - 1 : prevIndex - 1
+      );
+    } else if (e.deltaY > 0) {
+      // Scroll Down -> Move to the next card
+      setFlipped(false);
+      setActiveIndex((prevIndex) => (prevIndex + 1) % orderedFlashcards.length);
+    }
+  };
+
   return (
     <div
       className="relative flex justify-center items-center h-full w-full"
@@ -115,6 +130,7 @@ const FlashcardSwiper = ({ flashcards }) => {
       onMouseDown={handleMouseDown} // Add mouse down event
       onMouseMove={handleMouseMove} // Add mouse move event
       onMouseUp={handleMouseUp} // Add mouse up event
+      onWheel={handleWheel} // Add wheel event for scrolling
     >
       {orderedFlashcards.map((flashcard, index) => {
         const cardStyle = getCardStyle(index);
