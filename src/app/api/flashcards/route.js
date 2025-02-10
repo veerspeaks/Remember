@@ -2,23 +2,39 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 export async function GET(req) {
-    const { searchParams } = new URL(req.url);
-    const categoryId = parseInt(searchParams.get('categoryId'));
+    try {
+        const { searchParams } = new URL(req.url);
+        const categoryId = parseInt(searchParams.get('categoryId'));
 
-    if (!categoryId) {
+        if (!categoryId || isNaN(categoryId)) {
+            return NextResponse.json(
+                { error: 'Valid Category ID is required' }, 
+                { status: 400 }
+            );
+        }
+
+        const flashcards = await prisma.flashcard.findMany({
+            where: { categoryId: categoryId },
+            include: {
+                category: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+
+        return NextResponse.json(flashcards || [], { status: 200 });
+    } catch (error) {
+        console.error('Error fetching flashcards:', error);
         return NextResponse.json(
-            { error: 'Category ID is required' }, 
-            { status: 400 }
+            { error: 'Failed to fetch flashcards' }, 
+            { status: 500 }
         );
     }
-
-    const flashcards = await prisma.flashcard.findMany({
-        where: { categoryId: categoryId }
-    });
-
-    return NextResponse.json(flashcards, { status: 200 });
 }
 
 export async function POST(req) {
@@ -26,16 +42,17 @@ export async function POST(req) {
         const body = await req.json();
         const { content, back, categoryId } = body;
 
-        if (!content) {
+        if (!content || !back || !categoryId) {
             return NextResponse.json(
-                { message: "Card content is required" }, 
+                { error: "All fields are required" }, 
                 { status: 400 }
             );
         }
-        
-        if (!categoryId) {
+
+        const parsedCategoryId = parseInt(categoryId);
+        if (isNaN(parsedCategoryId)) {
             return NextResponse.json(
-                { message: "Category ID is required" }, 
+                { error: "Invalid category ID format" }, 
                 { status: 400 }
             );
         }
@@ -44,15 +61,15 @@ export async function POST(req) {
             data: {
                 question: content,
                 answer: back,
-                categoryId: parseInt(categoryId)
+                categoryId: parsedCategoryId
             }
         });
 
-        return NextResponse.json({ id: result.id, content }, { status: 201 });
+        return NextResponse.json(result, { status: 201 });
     } catch (error) {
-        console.error("Error in POST /api/flashcards:", error);
+        console.error("Error creating flashcard:", error);
         return NextResponse.json(
-            { message: 'Error adding card', error: error.message }, 
+            { error: 'Failed to create flashcard', details: error.message }, 
             { status: 500 }
         );
     }
