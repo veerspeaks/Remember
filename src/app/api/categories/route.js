@@ -2,10 +2,15 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
     try {
-        const categories = await prisma.category.findMany();
+        const categories = await prisma.category.findMany({
+            include: {
+                _count: {
+                    select: { flashcards: true }
+                }
+            }
+        });
         
-        // Ensure we're returning an array, even if empty
-        return new Response(JSON.stringify(categories || []), {
+        return new Response(JSON.stringify(categories), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
@@ -28,15 +33,16 @@ export async function POST(req) {
         const { name } = body;
 
         if (!name) {
-            return new Response(JSON.stringify({ message: "Category name is required" }), { status: 400 });
+            return new Response(JSON.stringify({ error: 'Category name is required' }), { status: 400 });
         }
 
-        const result = await prisma.category.create({
+        const category = await prisma.category.create({
             data: { name }
         });
 
-        return new Response(JSON.stringify({ id: result.id, name }), { status: 201 });
+        return new Response(JSON.stringify(category), { status: 201 });
     } catch (error) {
-        return new Response(JSON.stringify({ message: 'Error adding category', error }), { status: 500 });
+        console.error('Error creating category:', error);
+        return new Response(JSON.stringify({ error: 'Failed to create category' }), { status: 500 });
     }
 }
