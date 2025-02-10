@@ -12,7 +12,7 @@ export default function Loading() {
     <div
       className={`${geistMono.variable} fixed inset-0 flex items-center justify-center bg-black bg-opacity-100 z-50`}
     >
-      <h1 className="text-4xl font-bangers font-bold text-red-800 remember-animation">
+      <h1 className="text-4xl font-bangers font-bold text-yellow-500 remember-animation">
         {Array.from("REMEMBER?").map((letter, index) => (
           <span key={index} className={`bounce delay-${index}`}>
             {letter}

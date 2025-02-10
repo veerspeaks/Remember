@@ -1,42 +1,44 @@
-import query from "../../../lib/db.js";
-
+import { prisma } from '@/lib/prisma'
 
 export async function GET(req) {
-    
-    const {searchParams} = new URL(req.url)
-    const categoryId = searchParams.get('categoryId')
+    const { searchParams } = new URL(req.url);
+    const categoryId = parseInt(searchParams.get('categoryId'));
 
     if (!categoryId) {
         return new Response(JSON.stringify({ error: 'Category ID is required' }), { status: 400 });
-      }
-    
-      const flashcards = await query('SELECT * FROM flashcards WHERE category_id = ?', [categoryId]);
-      
-      return new Response(JSON.stringify(flashcards), { status: 200 });
     }
 
+    const flashcards = await prisma.flashcard.findMany({
+        where: { categoryId: categoryId }
+    });
 
+    return new Response(JSON.stringify(flashcards), { status: 200 });
+}
 
+export async function POST(req) {
+    try {
+        const body = await req.json();
+        const { content, back, categoryId } = body;
 
-export async function POST(req,res) {
-    
-  try {
-      const body = await req.json();  // Parse the JSON body
-      const {searchParams} = new URL(req.url)
-      const categoryId = searchParams.get('categoryId')
-      const { content , back} = body;
-           // Extract the content from the request body
+        if (!content) {
+            return new Response(JSON.stringify({ message: "Card content is required" }), { status: 400 });
+        }
+        
+        if (!categoryId) {
+            return new Response(JSON.stringify({ message: "Category ID is required" }), { status: 400 });
+        }
 
-      if (!content) {
-          return new Response(JSON.stringify({ message: "Card content is required" }), { status: 400 });
-      }
+        const result = await prisma.flashcard.create({
+            data: {
+                question: content,
+                answer: back,
+                categoryId: parseInt(categoryId)
+            }
+        });
 
-      // Insert the new category into the database
-      const result = await query('INSERT INTO flashcards (question,answer,category_id) VALUES (?,?,?)', [content, back ,categoryId]);
-
-      return new Response(JSON.stringify({ id: result.insertId, content }), { status: 201 });
-  } catch (error) {
-      return new Response(JSON.stringify({ message: 'Error adding category', error }), { status: 500 });
-  }
-  
+        return new Response(JSON.stringify({ id: result.id, content }), { status: 201 });
+    } catch (error) {
+        console.error("Error in POST /api/flashcards:", error);
+        return new Response(JSON.stringify({ message: 'Error adding card', error: error.message }), { status: 500 });
+    }
 }

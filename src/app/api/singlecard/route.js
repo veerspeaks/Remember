@@ -1,44 +1,60 @@
-import query from "../../../lib/db.js";
-
+import { prisma } from '@/lib/prisma'
 
 export async function GET(req) {
-    
-    
-    const {searchParams} = new URL(req.url)
-    const categoryId = searchParams.get('categoryId');
-    const cardId = searchParams.get('cardId');
+    const { searchParams } = new URL(req.url);
+    const categoryId = parseInt(searchParams.get('categoryId'));
+    const cardId = parseInt(searchParams.get('cardId'));
 
-    
-
-    if (!categoryId) {
-        return new Response(JSON.stringify({ error: `Category ID and cardId is required` }), { status: 400 });
-      }
-    
-      const singlecard = await query('SELECT * FROM flashcards WHERE category_id = ? AND id = ?', [categoryId, cardId]);
-
-      
-      return new Response(JSON.stringify(singlecard), { status: 200 });
+    if (!categoryId || !cardId) {
+        return new Response(JSON.stringify({ error: `Category ID and card ID are required` }), { status: 400 });
     }
 
-
-export async function POST(req){
-
-    try{
-        const body = await req.json();  // Parse the JSON body
-        const {searchParams} = new URL(req.url)
-        const cardId = searchParams.get('cardId')
-        const { content , back} = body;
-
-        if(!content){
-            return new Response(JSON.stringify({message:"card content is missing "}), {status:400})
+    const singlecard = await prisma.flashcard.findFirst({
+        where: {
+            categoryId: categoryId,
+            id: cardId
         }
-            const result = await query('UPDATE flashcards SET question = ?, answer = ? WHERE id = ?',[content, back, cardId])
-            // const result = await query('INSERT INTO flashcards (question,answer,category_id) VALUES (?,?,?)', [content, back ,categoryId]);
+    });
 
-            return new Response(JSON.stringify({ id: result.insertId, content }), { status: 201 });
-        }
-        catch (error) {
-            return new Response(JSON.stringify({ message: 'Error adding category', error }), { status: 500 });
-        }
-    }
+    return new Response(JSON.stringify(singlecard), { status: 200 });
+}
 
+
+
+
+export async function POST(req) {
+try {
+  const body = await req.json();
+  // Get cardId from the JSON body rather than from query parameters
+  const { content, back, cardId } = body;
+
+  if (!cardId) {
+    return new Response(
+      JSON.stringify({ message: "Card ID is required" }),
+      { status: 400 }
+    );
+  }
+
+  if (!content) {
+    return new Response(
+      JSON.stringify({ message: "Card content is missing" }),
+      { status: 400 }
+    );
+  }
+
+  const result = await prisma.flashcard.update({
+    where: { id: parseInt(cardId) },
+    data: { question: content, answer: back },
+  });
+
+  return new Response(JSON.stringify({ id: result.id, content }), {
+    status: 201,
+  });
+} catch (error) {
+  console.error("Error updating card:", error);
+  return new Response(
+    JSON.stringify({ message: "Error updating card", error: error.message }),
+    { status: 500 }
+  );
+}
+}

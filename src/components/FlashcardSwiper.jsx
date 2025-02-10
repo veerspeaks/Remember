@@ -13,6 +13,8 @@ const FlashcardSwiper = ({ flashcards }) => {
   const minSwipeDistance = 50; // Minimum distance for a swipe
   const maxTapDuration = 200; // Maximum duration for a tap (in milliseconds)
 
+  
+
   useEffect(() => {
     // Always display the last card first and shuffle the rest
     if (flashcards.length > 1) {
@@ -135,6 +137,7 @@ const FlashcardSwiper = ({ flashcards }) => {
       {orderedFlashcards.map((flashcard, index) => {
         const cardStyle = getCardStyle(index);
 
+        
         return (
           <div
             key={flashcard._id}
@@ -143,7 +146,7 @@ const FlashcardSwiper = ({ flashcards }) => {
             <Flashcard
               question={flashcard.question}
               answer={flashcard.answer}
-              categoryId={flashcard.category_id}
+              categoryId={flashcard.categoryId}
               cardId={flashcard.id}
               isFlipped={index === activeIndex && flipped} // Only flip the active card
               handleFlip={handleFlip} // Pass down the flip handler
