@@ -1,29 +1,22 @@
 import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
     try {
-        const categories = await prisma.category.findMany({
-            include: {
-                _count: {
-                    select: { flashcards: true }
-                }
-            }
-        });
+        const categories = await prisma.category.findMany();
         
-        return new Response(JSON.stringify(categories), {
+        // Ensure we're returning an array, even if empty
+        return NextResponse.json(categories || [], {
             status: 200,
-            headers: {
-                'Content-Type': 'application/json',
-            },
         });
     } catch (error) {
         console.error('Error fetching categories:', error);
-        return new Response(JSON.stringify({ error: 'Failed to fetch categories' }), {
-            status: 500,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        return NextResponse.json(
+            { error: 'Failed to fetch categories' }, 
+            { status: 500 }
+        );
     }
 }
 
@@ -33,16 +26,21 @@ export async function POST(req) {
         const { name } = body;
 
         if (!name) {
-            return new Response(JSON.stringify({ error: 'Category name is required' }), { status: 400 });
+            return NextResponse.json(
+                { message: "Category name is required" }, 
+                { status: 400 }
+            );
         }
 
-        const category = await prisma.category.create({
+        const result = await prisma.category.create({
             data: { name }
         });
 
-        return new Response(JSON.stringify(category), { status: 201 });
+        return NextResponse.json({ id: result.id, name }, { status: 201 });
     } catch (error) {
-        console.error('Error creating category:', error);
-        return new Response(JSON.stringify({ error: 'Failed to create category' }), { status: 500 });
+        return NextResponse.json(
+            { message: 'Error adding category', error }, 
+            { status: 500 }
+        );
     }
 }

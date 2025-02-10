@@ -1,18 +1,24 @@
 import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const categoryId = parseInt(searchParams.get('categoryId'));
 
     if (!categoryId) {
-        return new Response(JSON.stringify({ error: 'Category ID is required' }), { status: 400 });
+        return NextResponse.json(
+            { error: 'Category ID is required' }, 
+            { status: 400 }
+        );
     }
 
     const flashcards = await prisma.flashcard.findMany({
         where: { categoryId: categoryId }
     });
 
-    return new Response(JSON.stringify(flashcards), { status: 200 });
+    return NextResponse.json(flashcards, { status: 200 });
 }
 
 export async function POST(req) {
@@ -21,11 +27,17 @@ export async function POST(req) {
         const { content, back, categoryId } = body;
 
         if (!content) {
-            return new Response(JSON.stringify({ message: "Card content is required" }), { status: 400 });
+            return NextResponse.json(
+                { message: "Card content is required" }, 
+                { status: 400 }
+            );
         }
         
         if (!categoryId) {
-            return new Response(JSON.stringify({ message: "Category ID is required" }), { status: 400 });
+            return NextResponse.json(
+                { message: "Category ID is required" }, 
+                { status: 400 }
+            );
         }
 
         const result = await prisma.flashcard.create({
@@ -36,9 +48,12 @@ export async function POST(req) {
             }
         });
 
-        return new Response(JSON.stringify({ id: result.id, content }), { status: 201 });
+        return NextResponse.json({ id: result.id, content }, { status: 201 });
     } catch (error) {
         console.error("Error in POST /api/flashcards:", error);
-        return new Response(JSON.stringify({ message: 'Error adding card', error: error.message }), { status: 500 });
+        return NextResponse.json(
+            { message: 'Error adding card', error: error.message }, 
+            { status: 500 }
+        );
     }
 }

@@ -1,4 +1,7 @@
 import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
@@ -6,7 +9,10 @@ export async function GET(req) {
     const cardId = parseInt(searchParams.get('cardId'));
 
     if (!categoryId || !cardId) {
-        return new Response(JSON.stringify({ error: `Category ID and card ID are required` }), { status: 400 });
+        return NextResponse.json(
+            { error: 'Category ID and card ID are required' }, 
+            { status: 400 }
+        );
     }
 
     const singlecard = await prisma.flashcard.findFirst({
@@ -16,45 +22,38 @@ export async function GET(req) {
         }
     });
 
-    return new Response(JSON.stringify(singlecard), { status: 200 });
+    return NextResponse.json(singlecard, { status: 200 });
 }
-
-
-
 
 export async function POST(req) {
-try {
-  const body = await req.json();
-  // Get cardId from the JSON body rather than from query parameters
-  const { content, back, cardId } = body;
+    try {
+        const body = await req.json();
+        const { content, back, categoryId, cardId } = body;
 
-  if (!cardId) {
-    return new Response(
-      JSON.stringify({ message: "Card ID is required" }),
-      { status: 400 }
-    );
-  }
+        if (!content || !back || !categoryId || !cardId) {
+            return NextResponse.json(
+                { message: "All fields are required" }, 
+                { status: 400 }
+            );
+        }
 
-  if (!content) {
-    return new Response(
-      JSON.stringify({ message: "Card content is missing" }),
-      { status: 400 }
-    );
-  }
+        const result = await prisma.flashcard.update({
+            where: {
+                id: parseInt(cardId)
+            },
+            data: {
+                question: content,
+                answer: back,
+                categoryId: parseInt(categoryId)
+            }
+        });
 
-  const result = await prisma.flashcard.update({
-    where: { id: parseInt(cardId) },
-    data: { question: content, answer: back },
-  });
-
-  return new Response(JSON.stringify({ id: result.id, content }), {
-    status: 201,
-  });
-} catch (error) {
-  console.error("Error updating card:", error);
-  return new Response(
-    JSON.stringify({ message: "Error updating card", error: error.message }),
-    { status: 500 }
-  );
-}
+        return NextResponse.json(result, { status: 201 });
+    } catch (error) {
+        console.error("Error updating card:", error);
+        return NextResponse.json(
+            { message: 'Error updating card', error: error.message }, 
+            { status: 500 }
+        );
+    }
 }
