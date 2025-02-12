@@ -124,36 +124,91 @@ const FlashcardSwiper = ({ flashcards }) => {
     }
   };
 
-  return (
-    <div
-      className="relative flex justify-center items-center h-full w-full"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleMouseDown} // Add mouse down event
-      onMouseMove={handleMouseMove} // Add mouse move event
-      onMouseUp={handleMouseUp} // Add mouse up event
-      onWheel={handleWheel} // Add wheel event for scrolling
-    >
-      {orderedFlashcards.map((flashcard, index) => {
-        const cardStyle = getCardStyle(index);
+  const handleUpClick = () => {
+    setFlipped(false);
+    setActiveIndex((prevIndex) =>
+      prevIndex === 0 ? orderedFlashcards.length - 1 : prevIndex - 1
+    );
+  };
 
-        
-        return (
-          <div
-            key={flashcard._id}
-            className={`absolute w-80 h-80 bg-gray-300 rounded-lg shadow-lg transition-transform duration-500 ${cardStyle}`}
+  const handleDownClick = () => {
+    setFlipped(false);
+    setActiveIndex((prevIndex) => (prevIndex + 1) % orderedFlashcards.length);
+  };
+
+  return (
+    <div className="relative flex justify-center items-center h-full w-full">
+      {/* Main card container with all its event handlers */}
+      <div
+        className="relative flex justify-center items-center h-full"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onWheel={handleWheel}
+      >
+        {/* Up Arrow - Only visible on desktop */}
+        <button
+          onClick={handleUpClick}
+          className="hidden md:flex absolute -left-72 top-1/2 -translate-y-1/2 bg-yellow-500/10 hover:bg-yellow-500/20 p-3 rounded-full transform transition-all duration-300 hover:scale-110 group"
+          aria-label="Previous card"
+        >
+          <svg
+            className="w-6 h-6 text-yellow-500 transform rotate-180 transition-transform group-hover:-translate-y-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <Flashcard
-              question={flashcard.question}
-              answer={flashcard.answer}
-              categoryId={flashcard.categoryId}
-              cardId={flashcard.id}
-              isFlipped={index === activeIndex && flipped} // Only flip the active card
-              handleFlip={handleFlip} // Pass down the flip handler
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
             />
-          </div>
-        );
-      })}
+          </svg>
+        </button>
+
+        {orderedFlashcards.map((flashcard, index) => {
+          const cardStyle = getCardStyle(index);
+          return (
+            <div
+              key={flashcard._id}
+              className={`absolute w-80 h-80 bg-gray-300 rounded-lg shadow-lg transition-transform duration-500 ${cardStyle}`}
+            >
+              <Flashcard
+                question={flashcard.question}
+                answer={flashcard.answer}
+                categoryId={flashcard.categoryId}
+                cardId={flashcard.id}
+                isFlipped={index === activeIndex && flipped}
+                handleFlip={handleFlip}
+              />
+            </div>
+          );
+        })}
+
+        {/* Down Arrow - Only visible on desktop */}
+        <button
+          onClick={handleDownClick}
+          className="hidden md:flex absolute -right-72 top-1/2 -translate-y-1/2 bg-yellow-500/10 hover:bg-yellow-500/20 p-3 rounded-full transform transition-all duration-300 hover:scale-110 group"
+          aria-label="Next card"
+        >
+          <svg
+            className="w-6 h-6 text-yellow-500 transition-transform group-hover:translate-y-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };
